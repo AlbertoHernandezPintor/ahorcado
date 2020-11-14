@@ -1,10 +1,9 @@
 import React from 'react';
+import Template from './login-component.template';
 
 class LoginComponent extends React.Component {
   render () {
-    return (
-      <p>Login</p>
-    );
+    return Template();
   }
 }
 
