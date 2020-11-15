@@ -1,3 +1,10 @@
-body {
+.login-page {
     background-color: #F9C6C6;
+    min-height: 100vh;
+    min-width: 100vh;
+}
+
+.game-title {
+    font-size: 5em;
+    font-family: fantasy;
 }
