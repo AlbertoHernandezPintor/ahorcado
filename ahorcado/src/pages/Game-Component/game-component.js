@@ -1,10 +1,182 @@
 import React from 'react';
+import Template from './game-component.template';
+import { Form } from 'react-bootstrap';
+import Match from '../../models/Match';
+import Word from '../../components/Word-component/Word-component';
+
+const words = ["vaca", "soleado", "edificio", "cochera", "paracaidista", "murcielago", "nube", "pecera", "trompeta",
+"ordenador", "paisaje", "saxofon", "xilofono", "colegio", "percha", "universidad", "mejorar",
+"camion", "ferrari", "mercedes", "motocicleta", "bicicleta", "sevilla", "madrid", "salamanca", "valencia",
+"america", "asia", "europa", "napoleon", "television", "pantalla", "leon", "selva", "bosque", "persiana",
+"piscina", "trampolin", "oscuridad", "luminosidad", "claridad", "obstaculo", "esquina", "zangano", "zorro",
+"cerveza", "vino", "ventana", "cascada", "cebra", "caricatura", "creencia", "zocalo", "zumbar", "vibrar"];
+
+const letters= "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
 
 class GameComponent extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      difficulty: [
+        {key: "Fácil", value: "easy"},
+        {key: "Intermedio", value: "medium"},
+        {key: "Difícil", value: "hard"}
+      ],
+      difficultySelected: "",
+      showAlert: false,
+      match: new Match("",  "", [], 0),
+      selectedWord: Match.chooseWord(words),
+      startGame: false,
+      failsAllowed: "",
+      showWinAlert: false,
+      showLoseAlert: false
+    }
+
+    this.getDifficultyRadios = this.getDifficultyRadios.bind(this);
+    this.difficultyChange = this.difficultyChange.bind(this);
+    this.startGame = this.startGame.bind(this);
+    this.setShow = this.setShow.bind(this);
+    this.setWinShow = this.setWinShow.bind(this);
+    this.setLoseShow = this.setLoseShow.bind(this);
+    this.loadHiddenWord = this.loadHiddenWord.bind(this);
+    this.letterSelected = this.letterSelected.bind(this);
+    this.resetGame = this.resetGame.bind(this);
+  }
+
+  difficultyChange(event) {
+    this.setState({
+      difficultySelected: event.target.id
+    });
+  }
+
+  startGame() {
+    if (this.state.difficultySelected === "") {
+      this.setState({
+          showAlert: true
+      });
+    } else {
+      this.setState({
+        match: {
+          showLoseAlert: false,
+          showWinAlert: false,
+          showAlert: false,
+          difficulty: this.state.difficultySelected,
+          selectedWord: this.state.selectedWord,
+          hiddenLetters: Match.chooseLettersToNotShow(this.state.difficultySelected, this.state.selectedWord),
+          time: Match.setTimer(this.state.difficultySelected)
+        },
+        startGame: true,
+        failsAllowed: Match.calculateFailsAllowed(this.state.difficultySelected)
+      });
+    }
+  }
+
+  setShow() {
+    this.setState({
+        showAlert: false
+    });
+  }
+
+  setWinShow() {
+    this.setState({
+        showWinAlert: false
+    });
+  }
+
+  setLoseShow() {
+    this.setState({
+        showLoseAlert: false
+    });
+  }
+
+  getDifficultyRadios() {
+    return this.state.difficulty.map(function(difficulty){
+      return <Form.Check type="radio" label={ difficulty.key } key={`difficulty-${difficulty.value}`} name="difficulty-radios" id={`difficulty-${difficulty.value}`} className="difficulty-radio"/>;  
+    });
+  }
+
+  loadHiddenWord() {
+    if (this.state.selectedWord !== "" && this.state.startGame) {
+      var i = -1;
+      var show;
+      var hiddenLetters = this.state.match.hiddenLetters;
+      var selectedWord = this.state.selectedWord;
+
+      return selectedWord.split('').map(function(letter){
+        i++;
+        show = Match.setLetterShow(i, hiddenLetters);
+        return <Word letter={ letter } key={ i } showLetter= { show }></Word>;
+      });
+    }
+  }
+
+  letterSelected(event) {
+    var newHiddenLetters = Match.letterSelected(this.state.match.hiddenLetters, event.target.id, this.state.selectedWord);
+    if (newHiddenLetters === "fail") {
+      this.setState(function (prev, props){
+        return {failsAllowed: prev.failsAllowed-1}
+      });
+    } else {
+      this.setState({
+        match: {
+          hiddenLetters: newHiddenLetters
+        }
+      });
+    }
+
+    if (this.state.failsAllowed === 0) {
+      this.resetGame();
+    } else if (this.state.match.hiddenLetters.length === 0) {
+      this.setState ({
+        showWinAlert: true
+      });
+      this.resetGame();
+    }
+  }
+
+  resetGame() {
+    if (this.state.failsAllowed === 0) {
+      this.setState ({
+        showLoseAlert: true,
+        showAlert: false,
+        match: new Match("",  "", [], 0),
+        selectedWord: Match.chooseWord(words),
+        startGame: false,
+        failsAllowed: ""
+      });
+    } else {
+      this.setState({
+        showAlert: false,
+        match: new Match("",  "", [], 0),
+        selectedWord: Match.chooseWord(words),
+        startGame: false,
+        failsAllowed: ""
+      });
+    }
+  }
+
   render () {
-    return (
-      <p>Game</p>
-    );
+    let props = {
+      getDifficultyRadios: this.getDifficultyRadios,
+      difficultyChange: this.difficultyChange,
+      startGame: this.startGame,
+      showAlert: this.state.showAlert,
+      setShow: this.setShow,
+      showWinAlert: this.state.showWinAlert,
+      setWinShow: this.setWinShow,
+      showLoseAlert: this.state.showLoseAlert,
+      setLoseShow: this.setLoseShow,
+      loadHiddenWord: this.loadHiddenWord,
+      letters: letters,
+      letterSelected: this.letterSelected,
+      startGameVar: this.state.startGame,
+      resetGame: this.resetGame,
+      failsAllowed: this.state.failsAllowed,
+      timer: this.state.match.time
+    }
+
+    return Template({ ...props });
   }
 }
 

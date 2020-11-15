@@ -1,0 +1,39 @@
+.game-page {
+    min-height: 100vh;
+    background-color: #F9C6C6;;
+}
+
+.game-config {
+    min-height: 100vh !important;
+}
+
+.title-game-config {
+    font-size: 2em;
+    border-bottom: black 1px solid;
+}
+
+.config-option {
+    font-size: 1.5em;
+}
+
+.difficulty-radio input {
+    cursor: pointer;
+}
+
+.game-buttons {
+    background-color: #C6F9F2 !important;
+    color: black !important;
+    border: none !important;
+}
+
+.game-buttons:hover {
+    color: #8138FB !important;
+}
+
+.letters-selection-container {
+    overflow: hidden;
+}
+
+.fails {
+    font-size: 2em;
+}

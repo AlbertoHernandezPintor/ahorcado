@@ -17,7 +17,9 @@ class LoginComponent extends React.Component {
     this.setShow = this.setShow.bind(this);
   }
 
-  playGame() {
+  playGame(event) {
+    event.preventDefault();
+
     if (this.state.username !== "") {
       var player = new Player(this.state.username);
 
