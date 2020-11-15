@@ -21,7 +21,7 @@ class LoginComponent extends React.Component {
     event.preventDefault();
 
     if (this.state.username !== "") {
-      var player = new Player(this.state.username);
+      var player = new Player(this.state.username, 0, 0);
 
       if (localStorage.getItem(this.state.username) === null) {
         player.savePlayerLocalStorage();
@@ -30,7 +30,11 @@ class LoginComponent extends React.Component {
         player.savePlayerSessionStorage();
       }
 
-      this.props.history.push('/game');
+      this.props.history.push({
+        pathname: '/game',
+        search: '?username='+this.state.username
+      })
+        
     } else {
       this.setState(function(){
           return {

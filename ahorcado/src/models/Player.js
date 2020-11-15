@@ -1,7 +1,9 @@
 class Player {
 
-    constructor(username) {
+    constructor(username, wins, lose) {
         this.username = username;
+        this.wins = wins;
+        this.lose = lose;
     }
 
     savePlayerLocalStorage() {
@@ -13,6 +15,18 @@ class Player {
     savePlayerSessionStorage() {
         sessionStorage.clear();
         sessionStorage.setItem(this.username, this.username);
+    }
+
+    static updateLose(username) {
+        var user = JSON.parse(localStorage.getItem(username));
+        user.lose += 1;
+        localStorage.setItem(username, JSON.stringify(user));
+    }
+
+    static updateWin(username) {
+        var user = JSON.parse(localStorage.getItem(username));
+        user.wins += 1;
+        localStorage.setItem(username, JSON.stringify(user));
     }
 }
 

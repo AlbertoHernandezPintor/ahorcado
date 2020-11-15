@@ -2,6 +2,7 @@ import React from 'react';
 import Template from './game-component.template';
 import { Form } from 'react-bootstrap';
 import Match from '../../models/Match';
+import Player from '../../models/Player';
 import Word from '../../components/Word-component/Word-component';
 
 const words = ["vaca", "soleado", "edificio", "cochera", "paracaidista", "murcielago", "nube", "pecera", "trompeta",
@@ -30,7 +31,7 @@ class GameComponent extends React.Component {
       startGame: false,
       failsAllowed: "",
       showWinAlert: false,
-      showLoseAlert: false
+      showLoseAlert: false,
     }
 
     this.getDifficultyRadios = this.getDifficultyRadios.bind(this);
@@ -64,7 +65,7 @@ class GameComponent extends React.Component {
           difficulty: this.state.difficultySelected,
           selectedWord: this.state.selectedWord,
           hiddenLetters: Match.chooseLettersToNotShow(this.state.difficultySelected, this.state.selectedWord),
-          time: Match.setTimer(this.state.difficultySelected)
+          time: Match.setTimer(this.state.difficultySelected),
         },
         startGame: true,
         failsAllowed: Match.calculateFailsAllowed(this.state.difficultySelected)
@@ -131,12 +132,19 @@ class GameComponent extends React.Component {
       this.setState ({
         showWinAlert: true
       });
+
+      let url = new URL(document.location.href);
+      Player.updateWin(url.searchParams.get("username"));
+
       this.resetGame();
     }
   }
 
   resetGame() {
     if (this.state.failsAllowed === 0) {
+      let url = new URL(document.location.href);
+      Player.updateLose(url.searchParams.get("username"));
+
       this.setState ({
         showLoseAlert: true,
         showAlert: false,
