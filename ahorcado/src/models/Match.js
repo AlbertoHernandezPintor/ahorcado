@@ -1,9 +1,8 @@
 class Match {
-    constructor(difficulty, selectedWord, hiddenLetters, time) {
+    constructor(difficulty, selectedWord, hiddenLetters) {
         this.difficulty = difficulty;
         this.selectedWord = selectedWord;
         this.hiddenLetters = hiddenLetters;
-        this.time = time;
     }
 
     static chooseWord(words) {

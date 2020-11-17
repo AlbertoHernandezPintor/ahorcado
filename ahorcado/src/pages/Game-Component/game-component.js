@@ -26,12 +26,13 @@ class GameComponent extends React.Component {
       ],
       difficultySelected: "",
       showAlert: false,
-      match: new Match("",  "", [], 0),
+      match: new Match("",  "", []),
       selectedWord: Match.chooseWord(words),
       startGame: false,
       failsAllowed: "",
       showWinAlert: false,
       showLoseAlert: false,
+      time: 0
     }
 
     this.getDifficultyRadios = this.getDifficultyRadios.bind(this);
@@ -95,15 +96,29 @@ class GameComponent extends React.Component {
         match: {
           difficulty: this.state.difficultySelected,
           selectedWord: this.state.selectedWord,
-          hiddenLetters: Match.chooseLettersToNotShow(this.state.difficultySelected, this.state.selectedWord),
-          time: Match.setTimer(this.state.difficultySelected),
+          hiddenLetters: Match.chooseLettersToNotShow(this.state.difficultySelected, this.state.selectedWord)
         },
+        time: Match.setTimer(this.state.difficultySelected),
         startGame: true,
         failsAllowed: Match.calculateFailsAllowed(this.state.difficultySelected),
         showLoseAlert: false,
         showWinAlert: false,
         showAlert: false,
       });
+
+      if (this.state.difficultySelected !== "difficulty-easy") {
+        var interval = setInterval(() => {
+          if (this.state.time === 1) {
+            clearInterval(interval);
+            this.resetGame();
+          }
+          this.setState(function(prevs, props){
+            return {
+              time: prevs.time - 1
+          }
+          });
+        }, 1000);
+      }
     }
   }
 
@@ -184,7 +199,7 @@ class GameComponent extends React.Component {
     let url = new URL(document.location.href);
     Match.deleteMatchState(url.searchParams.get("username"));
 
-    if (this.state.failsAllowed === 0) {
+    if (this.state.failsAllowed === 0 || this.state.time === 1) {
       let url = new URL(document.location.href);
       Player.updateLose(url.searchParams.get("username"));
 
@@ -233,7 +248,8 @@ class GameComponent extends React.Component {
       startGameVar: this.state.startGame,
       resetGame: this.resetGame,
       failsAllowed: this.state.failsAllowed,
-      goToStats: this.goToStats
+      goToStats: this.goToStats,
+      timer: this.state.time
     }
 
     return Template({ ...props });
