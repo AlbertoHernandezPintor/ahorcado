@@ -1,0 +1,10 @@
+.stats-page {
+    min-height: 100vh;
+    background-color: #F9C6C6;;
+}
+
+.stats-title {
+    font-size: 5em;
+    font-family: fantasy;
+    height: fit-content !important;
+}

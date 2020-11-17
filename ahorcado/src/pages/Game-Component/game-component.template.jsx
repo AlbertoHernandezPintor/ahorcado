@@ -27,6 +27,10 @@ export default (props) => {
                                     <Button variant="primary" className="mr-2 game-buttons" type="button" onClick= { props.startGame } disabled={ props.startGameVar }>Comenzar partida</Button>
                                     <Button variant="primary" className="game-buttons" type="button" disabled={ !props.startGameVar } onClick={ props.resetGame }>Reiniciar partida</Button>
                                 </Form.Group>
+
+                                <Form.Group className="text-center">
+                                    <Button variant="primary" className="game-buttons" type="button" disabled={ props.startGameVar } onClick={ props.goToStats }>Estadísticas</Button>
+                                </Form.Group>
                             </Form>
                         </Col>
                     </Row>

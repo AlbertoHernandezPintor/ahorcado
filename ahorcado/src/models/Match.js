@@ -91,6 +91,32 @@ class Match {
             return 4;
         }
     }
+
+    static saveMatchState(difficulty, selectedWord, hiddenLetters, failsAllowed, username) {
+        var user = JSON.parse(localStorage.getItem(username));
+        var newUser = {
+            username: username,
+            wins: user.wins,
+            lose: user.lose,
+            difficultySelected: difficulty,
+            selectedWord: selectedWord,
+            hiddenLetters: hiddenLetters,
+            failsAllowed: failsAllowed
+        }
+
+        localStorage.setItem(username, JSON.stringify(newUser));
+    }
+
+    static deleteMatchState(username) {
+        var user = JSON.parse(localStorage.getItem(username));
+        var newUser = {
+            username: username,
+            wins: user.wins,
+            lose: user.lose,
+        }
+
+        localStorage.setItem(username, JSON.stringify(newUser));
+    }
 }
 
 export default Match;

@@ -43,7 +43,38 @@ class GameComponent extends React.Component {
     this.loadHiddenWord = this.loadHiddenWord.bind(this);
     this.letterSelected = this.letterSelected.bind(this);
     this.resetGame = this.resetGame.bind(this);
+    this.goToStats = this.goToStats.bind(this);
   }
+
+  componentDidMount() {
+    let url = new URL(document.location.href);
+    var user = JSON.parse(localStorage.getItem(url.searchParams.get("username")));
+    var lettersSelection = document.querySelector(".letters-selection-container");
+
+    if (sessionStorage.getItem(url.searchParams.get("username"))) {
+      if (user.selectedWord) {
+        lettersSelection.classList.remove("disabled");
+  
+        this.setState({
+          difficultySelected: user.difficultySelected,
+          selectedWord: user.selectedWord,
+          failsAllowed: user.failsAllowed,
+          match: {
+            difficulty: user.difficultySelected,
+            selectedWord: user.selectedWord,
+            hiddenLetters: user.hiddenLetters
+          },
+          startGame: true
+        });
+      } else {
+        lettersSelection.classList.add("disabled");
+      }
+    } else {
+      this.props.history.push({
+        pathname: '/error',
+      })
+    }
+}
 
   difficultyChange(event) {
     this.setState({
@@ -57,18 +88,21 @@ class GameComponent extends React.Component {
           showAlert: true
       });
     } else {
+      var lettersSelection = document.querySelector(".letters-selection-container");
+      lettersSelection.classList.remove("disabled");
+
       this.setState({
         match: {
-          showLoseAlert: false,
-          showWinAlert: false,
-          showAlert: false,
           difficulty: this.state.difficultySelected,
           selectedWord: this.state.selectedWord,
           hiddenLetters: Match.chooseLettersToNotShow(this.state.difficultySelected, this.state.selectedWord),
           time: Match.setTimer(this.state.difficultySelected),
         },
         startGame: true,
-        failsAllowed: Match.calculateFailsAllowed(this.state.difficultySelected)
+        failsAllowed: Match.calculateFailsAllowed(this.state.difficultySelected),
+        showLoseAlert: false,
+        showWinAlert: false,
+        showAlert: false,
       });
     }
   }
@@ -103,6 +137,9 @@ class GameComponent extends React.Component {
       var show;
       var hiddenLetters = this.state.match.hiddenLetters;
       var selectedWord = this.state.selectedWord;
+
+      let url = new URL(document.location.href);
+      Match.saveMatchState(this.state.difficultySelected, this.state.selectedWord, this.state.match.hiddenLetters, this.state.failsAllowed, url.searchParams.get("username"));
 
       return selectedWord.split('').map(function(letter){
         i++;
@@ -141,6 +178,12 @@ class GameComponent extends React.Component {
   }
 
   resetGame() {
+    var lettersSelection = document.querySelector(".letters-selection-container");
+    lettersSelection.classList.add("disabled");
+
+    let url = new URL(document.location.href);
+    Match.deleteMatchState(url.searchParams.get("username"));
+
     if (this.state.failsAllowed === 0) {
       let url = new URL(document.location.href);
       Player.updateLose(url.searchParams.get("username"));
@@ -164,6 +207,15 @@ class GameComponent extends React.Component {
     }
   }
 
+  goToStats() {
+    let url = new URL(document.location.href);
+
+    this.props.history.push({
+      pathname: '/stats',
+      search: '?username='+url.searchParams.get("username")
+    })
+  }
+
   render () {
     let props = {
       getDifficultyRadios: this.getDifficultyRadios,
@@ -181,7 +233,7 @@ class GameComponent extends React.Component {
       startGameVar: this.state.startGame,
       resetGame: this.resetGame,
       failsAllowed: this.state.failsAllowed,
-      timer: this.state.match.time
+      goToStats: this.goToStats
     }
 
     return Template({ ...props });
