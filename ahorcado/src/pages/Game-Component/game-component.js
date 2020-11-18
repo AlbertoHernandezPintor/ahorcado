@@ -60,6 +60,7 @@ class GameComponent extends React.Component {
           difficultySelected: user.difficultySelected,
           selectedWord: user.selectedWord,
           failsAllowed: user.failsAllowed,
+          time: user.time,
           match: {
             difficulty: user.difficultySelected,
             selectedWord: user.selectedWord,
@@ -67,6 +68,8 @@ class GameComponent extends React.Component {
           },
           startGame: true
         });
+
+        this.timer();
       } else {
         lettersSelection.classList.add("disabled");
       }
@@ -106,19 +109,23 @@ class GameComponent extends React.Component {
         showAlert: false,
       });
 
-      if (this.state.difficultySelected !== "difficulty-easy") {
-        var interval = setInterval(() => {
-          if (this.state.time === 1) {
-            clearInterval(interval);
-            this.resetGame();
-          }
-          this.setState(function(prevs, props){
-            return {
-              time: prevs.time - 1
-          }
-          });
-        }, 1000);
-      }
+      this.timer();
+    }
+  }
+
+  timer() {
+    if (this.state.difficultySelected !== "difficulty-easy") {
+      var interval = setInterval(() => {
+        if (this.state.time === 1 || !this.state.startGame) {
+          clearInterval(interval);
+          this.resetGame();
+        }
+        this.setState(function(prevs, props){
+          return {
+            time: prevs.time - 1
+        }
+        });
+      }, 1000);
     }
   }
 
@@ -154,7 +161,7 @@ class GameComponent extends React.Component {
       var selectedWord = this.state.selectedWord;
 
       let url = new URL(document.location.href);
-      Match.saveMatchState(this.state.difficultySelected, this.state.selectedWord, this.state.match.hiddenLetters, this.state.failsAllowed, url.searchParams.get("username"));
+      Match.saveMatchState(this.state.difficultySelected, this.state.selectedWord, this.state.match.hiddenLetters, this.state.time, this.state.failsAllowed, url.searchParams.get("username"));
 
       return selectedWord.split('').map(function(letter){
         i++;
@@ -206,18 +213,20 @@ class GameComponent extends React.Component {
       this.setState ({
         showLoseAlert: true,
         showAlert: false,
-        match: new Match("",  "", [], 0),
+        match: new Match("",  "", []),
         selectedWord: Match.chooseWord(words),
         startGame: false,
-        failsAllowed: ""
+        failsAllowed: "",
+        time: 1
       });
     } else {
       this.setState({
         showAlert: false,
-        match: new Match("",  "", [], 0),
+        match: new Match("",  "", []),
         selectedWord: Match.chooseWord(words),
         startGame: false,
-        failsAllowed: ""
+        failsAllowed: "",
+        time: 1
       });
     }
   }

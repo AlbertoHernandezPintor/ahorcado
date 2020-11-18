@@ -91,7 +91,7 @@ class Match {
         }
     }
 
-    static saveMatchState(difficulty, selectedWord, hiddenLetters, failsAllowed, username) {
+    static saveMatchState(difficulty, selectedWord, hiddenLetters, time, failsAllowed, username) {
         var user = JSON.parse(localStorage.getItem(username));
         var newUser = {
             username: username,
@@ -100,7 +100,8 @@ class Match {
             difficultySelected: difficulty,
             selectedWord: selectedWord,
             hiddenLetters: hiddenLetters,
-            failsAllowed: failsAllowed
+            failsAllowed: failsAllowed,
+            time: time
         }
 
         localStorage.setItem(username, JSON.stringify(newUser));
